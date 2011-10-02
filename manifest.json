@@ -1,0 +1,28 @@
+{
+  "name": "AnjoNaruko",
+  "version": "0.8.0",
+  "description": "Anjo Naruko a.k.a. Anal (CV. Haruka Tomatsu)",
+  "icons": {
+    "48": "img/forgot_me_not_48.png"
+  },
+  "background_page": "template/background.html",
+  "options_page": "template/options.html",
+  "content_scripts": [{
+    "matches": [
+      "https://api.twitter.com/oauth/authenticate*"
+    ],
+    "js": [ "js/content/oauth_authenticate.js" ],
+    "run_at": "document_end"
+  }],
+  "browser_action": {
+    "default_title": "",
+    "default_icon" : "img/forgot_me_not_48.png",
+    "default_popup": "template/popup.html"
+  },
+  "permissions": [
+    "http://*/*",
+    "https://*/*",
+    "notifications",
+    "tabs"
+  ]
+}

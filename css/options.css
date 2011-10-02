@@ -1,0 +1,21 @@
+html, body {
+  background-color: #fff;
+}
+body {
+  font-family: "メイリオ","Meiryo",Sans-Serif;
+  padding-top: 40px;
+}
+
+section {
+  padding-top: 20px;
+}
+label {
+  width: 200px;
+}
+form .input {
+  margin-left: 220px;
+}
+fieldset legend {
+  padding-left: 0;
+}
+

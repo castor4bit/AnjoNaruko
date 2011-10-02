@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="../css/popup.css">
+<link rel="stylesheet" type="text/css" href="../css/tweet.css">
+<script type="text/javascript" src="../js/libs/jquery/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="../js/libs/bootstrap/bootstrap-dropdown.js"></script>
+<script type="text/javascript" src="../js/core/db.js"></script>
+<script type="text/javascript" src="../js/popup.js"></script>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="fill">
+      <div class="container">
+        <img id="profile_img" src="../img/loading.gif">
+        <ul class="nav">
+          <li class="dropdown" data-dropdown="dropdown">
+            <a href="#" class="dropdown-toggle" id="profile_id">castor_4bit</a>
+            <ul id="mainmenu" class="dropdown-menu">
+              <li><a href="#" class="menuCmd" id="menuCmdRefresh">Refresh</a></li>
+              <li><a href="#" class="menuCmd" >Mark as Read</a></li>
+              <li class="divider"></li>
+              <li><a href="#" class="menuCmd">Normal View</a></li>
+              <li><a href="#" class="menuCmd">Single User View</a></li>
+              <li><a href="#" class="menuCmd">Conversation View</a></li>
+              <li class="divider"></li>
+              <li><a href="#" class="menuCmd" id="menuCmdNowbrowsing">Now Browsing</a></li>
+              <li class="divider"></li>
+              <li><a href="#" class="menuCmd" id="menuCmdSettings">Settings</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form action="" class="pull-right">
+          <input class="input-medium no-scrool-hook" type="text" placeholder="Search">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="postform">
+    <textarea class="no-scroll-hook" placeholder="What's happening?"></textarea>
+  </div>
+  <ul class="tabs">
+    <li class="active"><a href="#">Timeline</a></li>
+    <li><a href="#">Mentions</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Favorites</a></li>
+    <li><a href="#">Search</a></li>
+  </ul>
+  <div style="clear:both"></div>
+
+  <div id="tweets">
+  </div>
+  <div id="others">
+    <textarea id="scroll_hook"></textarea>
+  </div>
+</body>
+</html>

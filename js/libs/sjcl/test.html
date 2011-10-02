@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<script src="sjcl.js"></script>
+<div id="plain"></div>
+<div id="encrypted"></div>
+<div id="decrypted"></div>
+<script type="text/javascript">
+
+var pass = 'fdrsgge';
+var plain = 'ABC';
+/*
+var encrypted = sjcl.encrypt(pass, plain);
+var decrypted = sjcl.decrypt(pass, encrypted);
+*/
+var aes = sjcl.cipther.aes(pass);
+var encrypted = aes.encrypt(plain);
+var decrypted = aes.encrypt(encrypted);
+
+
+document.getElementById('plain').innerHTML = plain;
+document.getElementById('encrypted').innerHTML = encrypted;
+document.getElementById('decrypted').innerHTML = decrypted;
+
+</script>
+
+</html>

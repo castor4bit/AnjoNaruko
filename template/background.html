@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../js/libs/jquery/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="../js/libs/crypto/2.2.0-crypto-sha1-hmac-pbkdf2-ofb-aes.js"></script>
+<script type="text/javascript" src="../js/libs/oauth/sha1.js"></script>
+<script type="text/javascript" src="../js/libs/oauth/oauth.js"></script>
+<script type="text/javascript" src="../js/core/twitter.js"></script>
+<script type="text/javascript" src="../js/core/db.js"></script>
+<script type="text/javascript" src="../js/model/tweets.js"></script>
+<script type="text/javascript" src="../js/background.js"></script>
+<script type="text/javascript">
+
+//-------------------------------------------------------------------------------
+// DB初期化
+var webdb = new WebDb();
+
+function initDatabase() {
+  webdb.open("DefaultDB");
+  //webdb.execute( getSql('sql_drop_table') );
+  webdb.execute( getSql('sql_create_table') );
+  webdb.execute( getSql('sql_chomp'), [10000], function(){
+    // 初期描画
+    getTweets(function(tweets) {
+      for (var i=0; i<tweets.length; ++i) {
+        appendTweet(tweets[i]);
+      }
+    });
+  });
+}
+// データ作成
+function addTweet(tweet) {
+  var created = parseDate(tweet.created_at);
+  webdb.execute(getSql('sql_insert_tweet'),
+    [tweet.id_str, tweet.user.screen_name, tweet.user.name, tweet.text, tweet.user.profile_image_url, 0, created],
+    function(tx) {
+      console.log("[TWEET] "+ tweet.id_str +" : "+ tweet.text);
+
+      // 表示更新
+      var _tweet = {
+        status_id:    tweet.id_str,
+        screen_name:  tweet.user.screen_name,
+        name:         tweet.user.name,
+        tweet:        tweet.text,
+        image_url:    tweet.user.profile_image_url,
+        created:      created
+      }
+      appendTweet(_tweet);
+    },
+    function(tx, e) {
+      console.log("データ登録失敗: "+ e.message);
+    }
+  );
+}
+// 日付解析
+function parseDate(str) {
+  var _str = '';
+
+  if (m = str.match(/([a-z]{3})\s([a-z]{3})\s(\d+)\s(\d+:\d+:\d+)\s([+-]\d+)\s(\d+)/i)) {
+    // before: Wed Nov 18 18:54:12 +0000 2009
+    // after:  Web, 18 Nov 2009 18:54:12 GMT+0000
+    var _str = [ (m[1] +","), m[3], m[2], m[6], m[4], ("GMT"+ m[5]) ].join(' ');
+  }
+  return (new Date(_str)).getTime();
+}
+// 日付変換
+function formatDate(time) {
+  var date = new Date(time);
+  var str = date.getFullYear() +'/'
+          + ((date.getMonth() <  9) ? '0': '') + (date.getMonth() + 1) +'/'
+          + ((date.getDate()  < 10) ? '0': '') + date.getDate()  +' '
+          + ((date.getHours()   < 10) ? '0': '') + date.getHours()   +':'
+          + ((date.getMinutes() < 10) ? '0': '') + date.getMinutes() +':'
+          + ((date.getSeconds() < 10) ? '0': '') + date.getSeconds();
+
+  return str;
+}
+// URL自動リンク
+function autolink(str) {
+  var pattern = /\bh?ttps?:\/\/([a-z0-9]|[a-z0-9][-_a-z0-9\.]*[a-z0-9])\/[-_.!~*\/\'\#\?%a-z0-9:@\&=+\$,]*/ig;
+
+  return str.replace(pattern, function(whole) {
+    return getTemplate('template_autolink', { url: whole });
+  });
+}
+// SQL取得
+function getSql(id) {
+  var sql = '';
+  var target = document.getElementById(id);
+  if (!target) return sql;
+
+  var text = target.textContent || target.innerText;
+  var lines = text.split(/[\r\n]+/);
+  for (var i in lines) {
+    var line = lines[i].replace(/[\r\n]/, ' ');
+
+    if ((lines[i] == '') || lines[i].match(/^--/)) continue;
+    sql += line;
+  }
+  return sql;
+}
+
+// HTMLテンプレート取得
+function getTemplate(id, params) {
+  var pattern;
+  var params = params || {};
+  var template = '';
+
+  var target = document.getElementById(id);
+  if (!target) return template;
+
+  template = target.textContent || target.innerText;
+  template = template.replace(/^\s+|\s+$/g, '');
+  for (var i in params) {
+    pattern = new RegExp("{"+ i +"}", "ig");
+    template = template.replace(pattern, params[i]);
+  }
+  return template;
+}
+
+// データ取得
+function getTweets(callback) {
+  webdb.query(getSql('sql_select_tweets'), [200],
+    function(tx, rs) {
+      var tweets = [];
+      var len = rs.rows.length - 1;
+
+      for (var i=len; i>=0; --i) {
+        tweets.push({
+          id:           rs.rows.item(i).ID,
+          status_id:    rs.rows.item(i).STATUS_ID,
+          screen_name:  rs.rows.item(i).SCREEN_NAME,
+          name:         rs.rows.item(i).NAME,
+          tweet:        rs.rows.item(i).TWEET,
+          image_url:    rs.rows.item(i).IMAGE_URL,
+          read:         rs.rows.item(i).READ,
+          created:      rs.rows.item(i).CREATED
+        });
+      }
+      callback(tweets);
+    },
+    function(tx, e) {
+      console.log("データ取得失敗: "+ e.message);
+    }
+  );
+}
+
+// 表示更新
+function appendTweet(tweet) {
+  var target = document.getElementById('tweets');
+  var tmp = document.createElement('div');
+
+  tweet.created = formatDate(tweet.created);
+  tweet.tweet = autolink(tweet.tweet);
+  tweet.unread = (tweet.read != 1)? ' tweetBoxUnread' : '';
+  tmp.innerHTML = getTemplate('template_tweet', tweet);
+
+  if (tweet.read != 1) {
+    setBadgeValue(++Globals.unread);
+  }
+
+  if (target.firstChild) {
+    target.insertBefore(tmp.firstChild, target.firstChild);
+  } else {
+    target.appendChild(tmp.firstChild);
+  }
+}
+// 既読にする
+function markAsRead(id ,callback) {
+  webdb.execute(getSql('sql_mark_as_read'), [id], function(tx) {
+    setBadgeValue(--Globals.unread);
+
+    $('#tweetbox_'+ id).removeClass('tweetBoxUnread');
+    callback(tx);
+  });
+}
+
+//-----------------------------------------
+var anal = new AnjoNaruko();
+
+function init() {
+  // 初期化
+  initDatabase();
+  
+  // 起動
+  anal.run();
+}
+
+
+</script>
+</head>
+<body onload="init()">
+
+<div id="tweets"></div>
+
+<!-- SQL: テーブル作成 -->
+<script type="text/sql" id="sql_create_table">
+
+CREATE TABLE IF NOT EXISTS TWEETS (
+  ID INTEGER PRIMARY KEY ASC,
+  STATUS_ID TEXT UNIQUE,
+  SCREEN_NAME TEXT,
+  NAME TEXT,
+  TWEET TEXT,
+  IMAGE_URL TEXT,
+  READ TINYINT,
+  CREATED DATETIME
+)
+</script>
+
+<!-- SQL: テーブル削除 -->
+<script type="text/sql" id="sql_drop_table">
+
+DROP TABLE TWEETS
+</script>
+
+<!-- SQL: データ追加 -->
+<script type="text/sql" id="sql_insert_tweet">
+
+INSERT INTO TWEETS
+  (STATUS_ID, SCREEN_NAME, NAME, TWEET, IMAGE_URL, READ, CREATED)
+  VALUES
+  (?, ?, ?, ?, ?, ?, ?)
+</script>
+
+<!-- SQL: データ取得 -->
+<script type="text/sql" id="sql_select_tweets">
+
+SELECT * FROM TWEETS ORDER BY ID DESC LIMIT ?
+</script>
+
+<!-- SQL: 既読にする -->
+<script type="text/sql" id="sql_mark_as_read">
+
+UPDATE TWEETS SET read = 1 WHERE status_id = ?
+</script>
+
+<!-- SQL: 件数調整 -->
+<script type="text/sql" id="sql_chomp">
+
+DELETE FROM TWEETS WHERE ID < (SELECT ID FROM TWEETS ORDER BY ID DESC LIMIT ?, 1)
+</script>
+
+
+<!-- HTML: tweet -->
+<script type="text/template" id="template_tweet">
+
+<div class="tweetBox {unread}" id="tweetbox_{status_id}">
+  <div class="tweetBoxLeft">
+    <div class="tweetBoxInfoImage">
+      <img src="{image_url}" alt="">
+    </div>
+  </div>
+  <div class="tweetBoxRight">
+    <div class="tweetBoxHeader">
+      <div class="tweetBoxInfoName">{screen_name}</div>
+      <div class="tweetBoxInfoDate">{created}</div>
+    </div>
+    <div class="tweetBoxBody">{tweet}</div>
+    <div class="tweetBoxFooter">
+      <span class="tweetCommand cmdReply"    id="cmdReply_{status_id}">Reply</span> |
+      <span class="tweetCommand cmdRetweet"  id="cmdRetweet_{status_id}">Retweet</span> |
+      <span class="tweetCommand cmdFavorite" id="cmdFavorite_{status_id}"><span id="starFavorite_{status_id}">☆</span>Favorite</span>
+    </div>
+  </div>
+  <div class="tweetBoxNoticeUnread">
+    <img src="../img/unread.png" alt="">
+  </div>
+</div>
+
+</script>
+
+<!-- HTML: tweet -->
+<script type="text/template" id="template_autolink">
+  <a href="{url}" target="_autolink">{url}</a>
+</script>
+
+</body>
+</html>

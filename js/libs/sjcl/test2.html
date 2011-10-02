@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<script src="2.2.0-crypto-sha1-hmac-pbkdf2-ofb-aes.js"></script>
+<div id="plain"></div>
+<div id="encrypted"></div>
+<div id="decrypted"></div>
+<script type="text/javascript">
+
+var pass = 'fdrsgge';
+var plain = 'ABC';
+var encrypted = Crypto.AES.encrypt(plain, pass);
+var decrypted = Crypto.AES.decrypt(encrypted, pass);
+
+
+document.getElementById('plain').innerHTML = plain;
+document.getElementById('encrypted').innerHTML = encrypted;
+document.getElementById('decrypted').innerHTML = decrypted;
+
+</script>
+
+</html>

@@ -1,0 +1,97 @@
+.tweetBox {
+  display: -webkit-box;
+  -webkit-box-sizing: border-box;
+
+  width: 100%;
+  padding: 2px 0;
+  margin-bottom: 1px;
+  border-bottom: solid #888 1px;
+
+  color: #000;
+  font-size: 12px;
+  line-height: 1.4em;
+  background-color: #fff;
+  position: relative;
+}
+div.tweetBox:nth-child(odd) {
+  background-color: #f0f0f0;
+}
+div.tweetBox:nth-child(even) {
+  background-color: #fff;
+}
+
+.tweetBoxRight {
+  -webkit-box-flex: 1;
+  padding-right: 4px;
+}
+
+.tweetBoxInfoImage {
+  width: 64px;
+  text-align: center;
+}
+.tweetBoxInfoImage img {
+  max-width: 48px;
+  max-height: 48px;
+  margin: 2px auto;
+  background-color: #fff;
+  border: solid #888 1px;
+  border-radius: 2px;
+  -webkit-box-shadow: 2px 2px 4px #aaaaaa;
+}
+
+.tweetBoxHeader {
+  display: -webkit-box;
+}
+.tweetBoxInfoName {
+  color: #222;
+  font-weight: bold;
+  -webkit-box-flex: 1;
+}
+.tweetBoxInfoDate {
+  color: #666;
+  font-size: 11px;
+  text-align: right;
+  -webkit-box-flex: 1;
+}
+.tweetBoxBody {
+  word-wrap: break-word;
+  padding-bottom: 1.4em;
+}
+.tweetBoxBody a {
+  color: #555;
+  text-decoration: underline;
+}
+.tweetBoxBody a:hover {
+  color: #000;
+  text-decoration: none;
+}
+
+.tweetBoxFooter {
+  position: absolute;
+  bottom: 0;
+  right: 4px;
+  font-size: 11px;
+  color: #aaa;
+}
+
+.tweetBoxNoticeUnread {
+  position: absolute;
+  display: none;
+  top: 42px;
+  left: 46px;
+  z-index : 100;
+}
+
+.tweetCommand {
+  color: #aaa;
+  cursor: pointer;
+}
+.tweetCommand:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+/** */
+#tweets .tweetBoxUnread .tweetBoxNoticeUnread {
+  display: block;
+}
