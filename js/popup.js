@@ -49,6 +49,7 @@ $(function() {
   target.keypress(function(e) {
     switch (e.keyCode) {
       // enterキー
+      case 10:
       case 13:
         if (!Settings.isPosting && e.ctrlKey) {
           var elem = e.target;
@@ -94,7 +95,6 @@ $(function() {
         $('#scroll_hook').focus();
         // 最古の未読を検索
         var target = $('.tweetBoxUnread:last');
-        console.log(target);
         if (target.length > 0) {
           // 選択
           var id = target.attr('id').substring(target.attr('id').lastIndexOf('_') + 1);
