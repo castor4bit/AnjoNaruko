@@ -23,9 +23,7 @@ function initDatabase() {
   webdb.execute( getSql('sql_chomp'), [10000], function(){
     // 初期描画
     getTweets(function(tweets) {
-      for (var i=0; i<tweets.length; ++i) {
-        appendTweet(tweets[i]);
-      }
+      appendTweets(tweets);
     });
   });
 }
@@ -147,9 +145,9 @@ function getTweets(callback) {
 }
 
 // 表示更新
-function appendTweet(tweet) {
-  var target = document.getElementById('tweets');
+function appendTweet(tweet, target) {
   var tmp = document.createElement('div');
+  target = target || document.getElementById('tweets');
 
   tweet.created = formatDate(tweet.created);
   tweet.tweet = autolink(tweet.tweet);
@@ -166,6 +164,16 @@ function appendTweet(tweet) {
     target.appendChild(tmp.firstChild);
   }
 }
+function appendTweets(tweets) {
+  var target = document.getElementById('tweets');
+  var df = document.createDocumentFragment();
+  
+  for (var i=0; i<tweets.length; ++i) {
+    appendTweet(tweets[i], df);
+  }
+  target.appendChild(df);
+}
+
 // 既読にする
 function markAsRead(id ,callback) {
   webdb.execute(getSql('sql_mark_as_read'), [id], function(tx) {
