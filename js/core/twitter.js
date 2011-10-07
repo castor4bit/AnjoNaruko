@@ -32,9 +32,6 @@ TwitterClient.prototype = {
   init: function(accessToken, accessTokenSecret) {
     this.accessToken = accessToken;
     this.accessTokenSecret = accessTokenSecret;
-    
-    //this.accessToken = "9200072-9BElkptTY1HNTHzxgaujyhb6SBd0NIy8lJXWlRnVpo";
-    //this.accessTokenSecret = "pqmb2aySIIlnvbVragiqXhrnvObrPBniHVJvfjsYww";
   },
   
   getRequestToken: function(callback) {
