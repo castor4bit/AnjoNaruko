@@ -12,7 +12,7 @@ TwitterClient.prototype = {
   
   apiUrl: {
     'account': {
-      'verify_credentials': 'http://api.twitter.com/1/account/verify_credentials.json'
+      'verify_credentials': 'https://api.twitter.com/1/account/verify_credentials.json'
     },
     'statuses': {
       'update': 'https://twitter.com/statuses/update.json',

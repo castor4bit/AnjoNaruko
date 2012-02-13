@@ -20,8 +20,8 @@
     "default_popup": "template/popup.html"
   },
   "permissions": [
-    "http://*/*",
-    "https://*/*",
+    "http://*.twitter.com/*",
+    "https://*.twitter.com/*",
     "notifications",
     "tabs"
   ]
