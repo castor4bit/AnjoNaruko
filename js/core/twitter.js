@@ -164,7 +164,7 @@ TwitterClient.prototype = {
     if (method == 'POST') {
       headers['Content-Type'] = "application/x-www-form-urlencoded";
       body = qstr;
-    } else {
+    } else if (qstr.length > 0) {
       url += "?"+ qstr;
     }
     
@@ -175,11 +175,8 @@ TwitterClient.prototype = {
           case 200:
             callback(xhr.responseText);
             break;
-          case 401:
-            // TODO: error
-            break;
           default:
-            // TODO: error
+            console.log("[RESPONSE ERROR] "+ xhr.status +" "+ xhr.responseText);
             break;
         }
       }

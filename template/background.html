@@ -119,7 +119,7 @@ function getTemplate(id, params) {
 
 // データ取得
 function getTweets(callback) {
-  webdb.query(getSql('sql_select_tweets'), [200],
+  webdb.query(getSql('sql_select_tweets'), [500],
     function(tx, rs) {
       var tweets = [];
       var len = rs.rows.length - 1;
